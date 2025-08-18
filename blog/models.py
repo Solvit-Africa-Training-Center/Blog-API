@@ -126,7 +126,7 @@ class BlogPost(models.Model):
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
-        return reverse('blog:post-detail', kwargs={'pk': self.pk})
+        return reverse('blog:posts-detail', kwargs={'pk': self.pk})
     
     def is_published(self):
         return self.status == self.PUBLISHED
