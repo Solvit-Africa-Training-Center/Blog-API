@@ -48,7 +48,7 @@ class DownloadLogSerializer(serializers.ModelSerializer):
             'processing_time_seconds', 'processing_time_display',
             'is_successful', 'error_message', 'requested_at', 'completed_at'
         ]
-        read_only_fields = '__all__'
+        read_only_fields = fields
     
     def get_processing_time_display(self, obj):
         """Convert processing time to human readable format"""

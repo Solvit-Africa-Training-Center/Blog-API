@@ -1,0 +1,1923 @@
+openapi: 3.0.3
+info:
+  title: Blog API
+  version: 1.0.0
+  description: A comprehensive blog API with secure authentication and advanced features
+paths:
+  /api/auth/logout/:
+    post:
+      operationId: api_auth_logout_create
+      description: Logout endpoint that blacklists the refresh token
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/profile/:
+    get:
+      operationId: api_auth_profile_retrieve
+      description: User profile management
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    put:
+      operationId: api_auth_profile_update
+      description: User profile management
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    patch:
+      operationId: api_auth_profile_partial_update
+      description: User profile management
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+  /api/auth/register/:
+    post:
+      operationId: api_auth_register_create
+      description: User registration endpoint
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration'
+          description: ''
+  /api/auth/token/:
+    post:
+      operationId: api_auth_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/auth/token/refresh/:
+    post:
+      operationId: api_auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/auth/token/verify/:
+    post:
+      operationId: api_auth_token_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/blog/categories/:
+    get:
+      operationId: api_blog_categories_list
+      description: ViewSet for managing categories
+      parameters:
+      - in: query
+        name: name
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryList'
+          description: ''
+    post:
+      operationId: api_blog_categories_create
+      description: ViewSet for managing categories
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /api/blog/categories/{id}/:
+    get:
+      operationId: api_blog_categories_retrieve
+      description: ViewSet for managing categories
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    put:
+      operationId: api_blog_categories_update
+      description: ViewSet for managing categories
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    patch:
+      operationId: api_blog_categories_partial_update
+      description: ViewSet for managing categories
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    delete:
+      operationId: api_blog_categories_destroy
+      description: ViewSet for managing categories
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/blog/posts/:
+    get:
+      operationId: api_blog_posts_list
+      description: ViewSet for managing blog posts with advanced features
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBlogPostListList'
+          description: ''
+    post:
+      operationId: api_blog_posts_create
+      description: ViewSet for managing blog posts with advanced features
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlogPostCreateUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BlogPostCreateUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BlogPostCreateUpdateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPostCreateUpdate'
+          description: ''
+  /api/blog/posts/{id}/:
+    get:
+      operationId: api_blog_posts_retrieve
+      description: Retrieve a post and increment view count
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this blog post.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPostDetail'
+          description: ''
+    put:
+      operationId: api_blog_posts_update
+      description: ViewSet for managing blog posts with advanced features
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this blog post.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlogPostCreateUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BlogPostCreateUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BlogPostCreateUpdateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPostCreateUpdate'
+          description: ''
+    patch:
+      operationId: api_blog_posts_partial_update
+      description: ViewSet for managing blog posts with advanced features
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this blog post.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBlogPostCreateUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBlogPostCreateUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBlogPostCreateUpdateRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPostCreateUpdate'
+          description: ''
+    delete:
+      operationId: api_blog_posts_destroy
+      description: ViewSet for managing blog posts with advanced features
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this blog post.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/blog/posts/{id}/like/:
+    post:
+      operationId: api_blog_posts_like_create
+      description: Like/unlike a post
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this blog post.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlogPostDetailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BlogPostDetailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BlogPostDetailRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPostDetail'
+          description: ''
+  /api/blog/posts/my_posts/:
+    get:
+      operationId: api_blog_posts_my_posts_retrieve
+      description: Get current user's posts
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPostDetail'
+          description: ''
+  /api/blog/posts/popular/:
+    get:
+      operationId: api_blog_posts_popular_retrieve
+      description: Get popular posts based on views and likes
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPostDetail'
+          description: ''
+  /api/blog/posts/public_posts/:
+    get:
+      operationId: api_blog_posts_public_posts_retrieve
+      description: Get all public published posts
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPostDetail'
+          description: ''
+  /api/blog/tags/:
+    get:
+      operationId: api_blog_tags_list
+      description: ViewSet for managing tags
+      parameters:
+      - in: query
+        name: name
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTagList'
+          description: ''
+    post:
+      operationId: api_blog_tags_create
+      description: ViewSet for managing tags
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TagRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TagRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+          description: ''
+  /api/blog/tags/{id}/:
+    get:
+      operationId: api_blog_tags_retrieve
+      description: ViewSet for managing tags
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tag.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+          description: ''
+    put:
+      operationId: api_blog_tags_update
+      description: ViewSet for managing tags
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tag.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TagRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TagRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+          description: ''
+    patch:
+      operationId: api_blog_tags_partial_update
+      description: ViewSet for managing tags
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tag.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTagRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTagRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTagRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+          description: ''
+    delete:
+      operationId: api_blog_tags_destroy
+      description: ViewSet for managing tags
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tag.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/comments/:
+    get:
+      operationId: api_comments_list
+      description: ViewSet for managing comments
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommentList'
+          description: ''
+    post:
+      operationId: api_comments_create
+      description: ViewSet for managing comments
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommentCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommentCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentCreate'
+          description: ''
+  /api/comments/{id}/:
+    get:
+      operationId: api_comments_retrieve
+      description: ViewSet for managing comments
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+    put:
+      operationId: api_comments_update
+      description: ViewSet for managing comments
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+    patch:
+      operationId: api_comments_partial_update
+      description: ViewSet for managing comments
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCommentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCommentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCommentRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+    delete:
+      operationId: api_comments_destroy
+      description: ViewSet for managing comments
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/comments/my_comments/:
+    get:
+      operationId: api_comments_my_comments_retrieve
+      description: Get current user's comments
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+  /api/comments/post/{post_id}/:
+    get:
+      operationId: api_comments_post_retrieve
+      description: Get comments for a specific post
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+  /api/downloads/historical-posts/:
+    post:
+      operationId: api_downloads_historical_posts_create
+      description: Download historical posts with security checks
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/downloads/my-posts/:
+    post:
+      operationId: api_downloads_my_posts_create
+      description: Download user's own posts
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/downloads/usage-stats/:
+    get:
+      operationId: api_downloads_usage_stats_list
+      description: View user's download history and usage statistics
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDownloadLogList'
+          description: ''
+components:
+  schemas:
+    BlogPostCreateUpdate:
+      type: object
+      description: Serializer for creating and updating blog posts
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        content:
+          type: string
+        excerpt:
+          type: string
+          description: Brief description of the post
+          maxLength: 300
+        category:
+          type: integer
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: integer
+        is_public:
+          type: boolean
+          description: Public posts are visible to all authenticated users
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        meta_description:
+          type: string
+          maxLength: 160
+        featured_image:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - content
+      - title
+    BlogPostCreateUpdateRequest:
+      type: object
+      description: Serializer for creating and updating blog posts
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        content:
+          type: string
+          minLength: 1
+        excerpt:
+          type: string
+          description: Brief description of the post
+          maxLength: 300
+        category:
+          type: integer
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: integer
+        is_public:
+          type: boolean
+          description: Public posts are visible to all authenticated users
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        meta_description:
+          type: string
+          maxLength: 160
+        featured_image:
+          type: string
+          format: binary
+          nullable: true
+      required:
+      - content
+      - title
+    BlogPostDetail:
+      type: object
+      description: Detailed serializer for individual blog posts
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        content:
+          type: string
+        excerpt:
+          type: string
+          description: Brief description of the post
+          maxLength: 300
+        author:
+          type: string
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/Category'
+          readOnly: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          readOnly: true
+        is_public:
+          type: boolean
+          description: Public posts are visible to all authenticated users
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        meta_description:
+          type: string
+          maxLength: 160
+        featured_image:
+          type: string
+          format: uri
+          nullable: true
+        publication_date:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        view_count:
+          type: integer
+          readOnly: true
+        like_count:
+          type: integer
+          readOnly: true
+        comments_count:
+          type: string
+          readOnly: true
+        reading_time:
+          type: string
+          readOnly: true
+      required:
+      - author
+      - category
+      - comments_count
+      - content
+      - created_at
+      - id
+      - like_count
+      - reading_time
+      - slug
+      - tags
+      - title
+      - updated_at
+      - view_count
+    BlogPostDetailRequest:
+      type: object
+      description: Detailed serializer for individual blog posts
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        content:
+          type: string
+          minLength: 1
+        excerpt:
+          type: string
+          description: Brief description of the post
+          maxLength: 300
+        is_public:
+          type: boolean
+          description: Public posts are visible to all authenticated users
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        meta_description:
+          type: string
+          maxLength: 160
+        featured_image:
+          type: string
+          format: binary
+          nullable: true
+        publication_date:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - content
+      - title
+    BlogPostList:
+      type: object
+      description: Lightweight serializer for blog post lists
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 200
+          pattern: ^[-a-zA-Z0-9_]+$
+        excerpt:
+          type: string
+          description: Brief description of the post
+          maxLength: 300
+        author_name:
+          type: string
+          readOnly: true
+        author_username:
+          type: string
+          readOnly: true
+        category_name:
+          type: string
+          readOnly: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          readOnly: true
+        is_public:
+          type: boolean
+          description: Public posts are visible to all authenticated users
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        featured_image:
+          type: string
+          format: uri
+          nullable: true
+        publication_date:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        view_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        like_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        comments_count:
+          type: string
+          readOnly: true
+        reading_time:
+          type: string
+          readOnly: true
+      required:
+      - author_name
+      - author_username
+      - category_name
+      - comments_count
+      - created_at
+      - id
+      - reading_time
+      - tags
+      - title
+    Category:
+      type: object
+      description: Serializer for Category model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        posts_count:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - posts_count
+      - slug
+    CategoryRequest:
+      type: object
+      description: Serializer for Category model
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+      required:
+      - name
+    Comment:
+      type: object
+      description: Serializer for comments with nested replies support
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+          maxLength: 1000
+        author_name:
+          type: string
+          readOnly: true
+        author_username:
+          type: string
+          readOnly: true
+        author_avatar:
+          type: string
+          readOnly: true
+        post:
+          type: integer
+        post_title:
+          type: string
+          readOnly: true
+        parent:
+          type: integer
+          nullable: true
+        replies:
+          type: string
+          readOnly: true
+        is_approved:
+          type: boolean
+          readOnly: true
+        is_edited:
+          type: boolean
+          readOnly: true
+        is_author:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_avatar
+      - author_name
+      - author_username
+      - content
+      - created_at
+      - id
+      - is_approved
+      - is_author
+      - is_edited
+      - post
+      - post_title
+      - replies
+      - updated_at
+    CommentCreate:
+      type: object
+      description: Simplified serializer for creating comments
+      properties:
+        content:
+          type: string
+          maxLength: 1000
+        post:
+          type: integer
+        parent:
+          type: integer
+          nullable: true
+      required:
+      - content
+      - post
+    CommentCreateRequest:
+      type: object
+      description: Simplified serializer for creating comments
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        post:
+          type: integer
+        parent:
+          type: integer
+          nullable: true
+      required:
+      - content
+      - post
+    CommentRequest:
+      type: object
+      description: Serializer for comments with nested replies support
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        post:
+          type: integer
+        parent:
+          type: integer
+          nullable: true
+      required:
+      - content
+      - post
+    DownloadLog:
+      type: object
+      description: Serializer for download logs
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request_id:
+          type: string
+          format: uuid
+          readOnly: true
+        user_email:
+          type: string
+          readOnly: true
+        download_type:
+          allOf:
+          - $ref: '#/components/schemas/DownloadTypeEnum'
+          readOnly: true
+        file_format:
+          type: string
+          readOnly: true
+        total_records:
+          type: integer
+          readOnly: true
+        file_size_bytes:
+          type: integer
+          readOnly: true
+        file_size_display:
+          type: string
+          readOnly: true
+        processing_time_seconds:
+          type: number
+          format: double
+          readOnly: true
+        processing_time_display:
+          type: string
+          readOnly: true
+        is_successful:
+          type: boolean
+          readOnly: true
+        error_message:
+          type: string
+          readOnly: true
+        requested_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - completed_at
+      - download_type
+      - error_message
+      - file_format
+      - file_size_bytes
+      - file_size_display
+      - id
+      - is_successful
+      - processing_time_display
+      - processing_time_seconds
+      - request_id
+      - requested_at
+      - total_records
+      - user_email
+    DownloadTypeEnum:
+      enum:
+      - historical_posts
+      - user_posts
+      - category_posts
+      type: string
+      description: |-
+        * `historical_posts` - Historical Posts
+        * `user_posts` - User Posts
+        * `category_posts` - Category Posts
+    PaginatedBlogPostListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlogPostList'
+    PaginatedCategoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+    PaginatedCommentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+    PaginatedDownloadLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DownloadLog'
+    PaginatedTagList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+    PatchedBlogPostCreateUpdateRequest:
+      type: object
+      description: Serializer for creating and updating blog posts
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        content:
+          type: string
+          minLength: 1
+        excerpt:
+          type: string
+          description: Brief description of the post
+          maxLength: 300
+        category:
+          type: integer
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: integer
+        is_public:
+          type: boolean
+          description: Public posts are visible to all authenticated users
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        meta_description:
+          type: string
+          maxLength: 160
+        featured_image:
+          type: string
+          format: binary
+          nullable: true
+    PatchedCategoryRequest:
+      type: object
+      description: Serializer for Category model
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+    PatchedCommentRequest:
+      type: object
+      description: Serializer for comments with nested replies support
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        post:
+          type: integer
+        parent:
+          type: integer
+          nullable: true
+    PatchedTagRequest:
+      type: object
+      description: Serializer for Tag model
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+    PatchedUserProfileRequest:
+      type: object
+      description: Serializer for user profile management
+      properties:
+        first_name:
+          type: string
+          maxLength: 30
+        last_name:
+          type: string
+          maxLength: 30
+        bio:
+          type: string
+          maxLength: 500
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+    StatusEnum:
+      enum:
+      - draft
+      - published
+      - archived
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `published` - Published
+        * `archived` - Archived
+    Tag:
+      type: object
+      description: Serializer for Tag model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        posts_count:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - posts_count
+      - slug
+    TagRequest:
+      type: object
+      description: Serializer for Tag model
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+      required:
+      - name
+    TokenObtainPair:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - refresh
+    TokenObtainPairRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    TokenVerifyRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - token
+    UserProfile:
+      type: object
+      description: Serializer for user profile management
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        email:
+          type: string
+          format: email
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 30
+        last_name:
+          type: string
+          maxLength: 30
+        full_name:
+          type: string
+          readOnly: true
+        bio:
+          type: string
+          maxLength: 500
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        is_verified:
+          type: boolean
+          readOnly: true
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        posts_count:
+          type: string
+          readOnly: true
+        comments_count:
+          type: string
+          readOnly: true
+        download_count:
+          type: integer
+          readOnly: true
+      required:
+      - comments_count
+      - date_joined
+      - download_count
+      - email
+      - full_name
+      - id
+      - is_verified
+      - posts_count
+      - username
+    UserProfileRequest:
+      type: object
+      description: Serializer for user profile management
+      properties:
+        first_name:
+          type: string
+          maxLength: 30
+        last_name:
+          type: string
+          maxLength: 30
+        bio:
+          type: string
+          maxLength: 500
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+    UserRegistration:
+      type: object
+      description: Serializer for user registration with validation
+      properties:
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 30
+        last_name:
+          type: string
+          maxLength: 30
+        bio:
+          type: string
+          maxLength: 500
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - email
+      - username
+    UserRegistrationRequest:
+      type: object
+      description: Serializer for user registration with validation
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+        first_name:
+          type: string
+          maxLength: 30
+        last_name:
+          type: string
+          maxLength: 30
+        bio:
+          type: string
+          maxLength: 500
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - email
+      - password
+      - password_confirm
+      - username
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

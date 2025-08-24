@@ -1,4 +1,4 @@
-# ===== downloads/views.py =====
+
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -116,12 +116,20 @@ class HistoricalPostsDownloadView(APIView):
             Q(author=user)
         ).select_related('author', 'category').prefetch_related('tags')
         
-        # Apply date filters
+        # Apply date filters with timezone awareness
         if filters.get('date_from'):
-            queryset = queryset.filter(publication_date__gte=filters['date_from'])
+            date_from = filters['date_from']
+            # Ensure timezone awareness
+            if timezone.is_naive(date_from):
+                date_from = timezone.make_aware(date_from)
+            queryset = queryset.filter(publication_date__gte=date_from)
         
         if filters.get('date_to'):
-            queryset = queryset.filter(publication_date__lte=filters['date_to'])
+            date_to = filters['date_to']
+            # Ensure timezone awareness
+            if timezone.is_naive(date_to):
+                date_to = timezone.make_aware(date_to)
+            queryset = queryset.filter(publication_date__lte=date_to)
         
         # Category filter
         if filters.get('category'):
@@ -129,6 +137,7 @@ class HistoricalPostsDownloadView(APIView):
                 category = Category.objects.get(name__icontains=filters['category'])
                 queryset = queryset.filter(category=category)
             except Category.DoesNotExist:
+                logger.warning(f"Category not found: {filters['category']}")
                 pass
         
         # Include private posts only if requested and they belong to user
@@ -290,10 +299,11 @@ class DownloadUsageView(generics.ListAPIView):
         successful_downloads = logs.filter(is_successful=True).count()
         failed_downloads = logs.filter(is_successful=False).count()
         
-        # Calculate total data downloaded
-        total_data_mb = sum(
-            log.file_size_bytes for log in logs.filter(is_successful=True)
-        ) / (1024 * 1024)
+        # Calculate total data downloaded (handle None values)
+        total_bytes = sum(
+            log.file_size_bytes or 0 for log in logs.filter(is_successful=True)
+        )
+        total_data_mb = total_bytes / (1024 * 1024)
         
         # Recent activity (last 30 days)
         recent_date = timezone.now() - timezone.timedelta(days=30)

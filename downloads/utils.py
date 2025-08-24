@@ -111,11 +111,11 @@ class DataExporter:
             post_element.set('id', str(post.id))
             
             # Basic fields
-            ET.SubElement(post_element, 'title').text = post.title
-            ET.SubElement(post_element, 'content').text = post.content
+            ET.SubElement(post_element, 'title').text = post.title or ''
+            ET.SubElement(post_element, 'content').text = post.content or ''
             ET.SubElement(post_element, 'excerpt').text = post.excerpt or ''
             ET.SubElement(post_element, 'is_public').text = str(post.is_public)
-            ET.SubElement(post_element, 'status').text = post.status
+            ET.SubElement(post_element, 'status').text = post.status or ''
             ET.SubElement(post_element, 'view_count').text = str(post.view_count)
             ET.SubElement(post_element, 'like_count').text = str(post.like_count)
             ET.SubElement(post_element, 'created_at').text = post.created_at.isoformat()
@@ -126,22 +126,22 @@ class DataExporter:
             
             # Author
             author_element = ET.SubElement(post_element, 'author')
-            ET.SubElement(author_element, 'username').text = post.author.username
-            ET.SubElement(author_element, 'email').text = post.author.email
-            ET.SubElement(author_element, 'full_name').text = post.author.get_full_name()
+            ET.SubElement(author_element, 'username').text = post.author.username or ''
+            ET.SubElement(author_element, 'email').text = post.author.email or ''
+            ET.SubElement(author_element, 'full_name').text = post.author.get_full_name() or ''
             
             # Category
             if post.category:
                 category_element = ET.SubElement(post_element, 'category')
-                ET.SubElement(category_element, 'name').text = post.category.name
-                ET.SubElement(category_element, 'slug').text = post.category.slug
+                ET.SubElement(category_element, 'name').text = post.category.name or ''
+                ET.SubElement(category_element, 'slug').text = post.category.slug or ''
             
             # Tags
             tags_element = ET.SubElement(post_element, 'tags')
             for tag in post.tags.all():
                 tag_element = ET.SubElement(tags_element, 'tag')
-                ET.SubElement(tag_element, 'name').text = tag.name
-                ET.SubElement(tag_element, 'slug').text = tag.slug
+                ET.SubElement(tag_element, 'name').text = tag.name or ''
+                ET.SubElement(tag_element, 'slug').text = tag.slug or ''
         
         return ET.tostring(root, encoding='unicode')
 
@@ -163,3 +163,6 @@ def create_download_response(content, filename, content_type):
     response = HttpResponse(content, content_type=content_type)
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     response['Content-Length'] = len(content.encode('utf-8'))
+    
+    # Return the response object
+    return response

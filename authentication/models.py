@@ -16,6 +16,7 @@ class CustomUser(AbstractUser):
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+  
     
     # Track API usage
     last_download = models.DateTimeField(null=True, blank=True)
